@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mesh Comparison Experiment</title>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/examples/js/loaders/OBJLoader.js"></script>
   <style>
     body {
       margin: 0;
@@ -61,7 +59,10 @@
     <button onclick="submitChoice('left')">Prefer Left</button>
     <button onclick="submitChoice('right')">Prefer Right</button>
   </div>
-  <script>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.module.js';
+    import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.148.0/examples/jsm/loaders/OBJLoader.js';
+
     const meshSets = [
       'meshes/set1',
       'meshes/set2',
@@ -89,7 +90,7 @@
     }
 
     function loadMesh(path, viewer) {
-      const loader = new THREE.OBJLoader();
+      const loader = new OBJLoader();
       loader.load(`${path}.obj`, function (object) {
         viewer.scene.clear();
         viewer.scene.add(object);
@@ -115,7 +116,7 @@
       loadMesh(`${path}/right`, rightViewer);
     }
 
-    function submitChoice(choice) {
+    window.submitChoice = function(choice) {
       responses.push({
         set: meshSets[currentSetIndex],
         choice
@@ -126,7 +127,7 @@
       } else {
         sendResults();
       }
-    }
+    };
 
     function sendResults() {
       const csv = 'set,choice\n' + responses.map(r => `${r.set},${r.choice}`).join('\n');
