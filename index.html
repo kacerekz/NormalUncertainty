@@ -47,6 +47,13 @@
     button:hover {
       background-color: #357ab8;
     }
+    #instructions {
+      margin: 30px auto;
+      max-width: 800px;
+      text-align: center;
+      font-size: 16px;
+      color: #cccccc;
+    }
   </style>
   <script type="importmap">
     {
@@ -197,8 +204,11 @@
     <div id="right" class="viewer"></div>
   </div>
   <div id="controls">
-    <button onclick="submitChoice('left')">Prefer Left</button>
-    <button onclick="submitChoice('right')">Prefer Right</button>
+    <button onclick="submitChoice('left')">Preferuji levý</button>
+    <button onclick="submitChoice('right')">Preferuji pravý</button>
+  </div>
+  <div id="instructions">
+    <p><strong>Ovládání:</strong> Střední tlačítko myši pro přiblížení/oddálení, tažení myší pro otáčení, Shift + tažení pro posun.</p>
   </div>
 </body>
 </html>
