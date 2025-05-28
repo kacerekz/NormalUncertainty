@@ -131,7 +131,7 @@
     function sendResults() {
       const csv = 'set,choice\n' + responses.map(r => `${r.set},${r.choice}`).join('\n');
       const form = document.createElement('form');
-      form.action = 'https://formspree.io/f/movdgypd'; // Replace with your Formspree form ID
+      form.action = 'https://formspree.io/f/movdgypd';
       form.method = 'POST';
       form.style.display = 'none';
 
