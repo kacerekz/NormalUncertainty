@@ -59,6 +59,7 @@
   <script type="module">
     import * as THREE from 'three';
     import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     const meshSets = [
       'meshes/set1',
@@ -73,22 +74,42 @@
       const container = document.getElementById(containerId);
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(0, 1, 1).normalize();
-      scene.add(light);
+      const ambientLight = new THREE.AmbientLight(0x888888);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(0, 1, 1).normalize();
+
+      scene.add(ambientLight);
+      scene.add(directionalLight);
 
       camera.position.z = 2;
 
-      return { scene, camera, renderer, container };
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      return { scene, camera, renderer, container, controls };
     }
 
     function loadMesh(path, viewer) {
       const loader = new OBJLoader();
       loader.load(`${path}.obj`, function (object) {
+        object.traverse(child => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+          }
+        });
+
+        const box = new THREE.Box3().setFromObject(object);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3()).length();
+
+        object.position.sub(center); // center the object
+        const scale = 1 / size;
+        object.scale.setScalar(scale); // normalize size
+
         viewer.scene.clear();
         viewer.scene.add(object);
       });
@@ -100,9 +121,10 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      leftViewer.renderer.render(leftViewer.scene, leftViewer.camera);
-      middleViewer.renderer.render(middleViewer.scene, middleViewer.camera);
-      rightViewer.renderer.render(rightViewer.scene, rightViewer.camera);
+      [leftViewer, middleViewer, rightViewer].forEach(viewer => {
+        viewer.controls.update();
+        viewer.renderer.render(viewer.scene, viewer.camera);
+      });
     }
     animate();
 
