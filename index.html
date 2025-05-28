@@ -73,24 +73,27 @@
     function initViewer(containerId) {
       const container = document.getElementById(containerId);
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      scene.background = new THREE.Color(0x2c2c3c);
+      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 100);
       const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0x888888);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(0, 1, 1).normalize();
+      directionalLight.position.set(5, 10, 7.5);
 
       scene.add(ambientLight);
       scene.add(directionalLight);
 
-      camera.position.z = 2;
+      camera.position.set(0, 0, 2);
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.screenSpacePanning = false;
 
-      return { scene, camera, renderer, container, controls };
+      return { scene, camera, renderer, container, controls, objectGroup: null };
     }
 
     function loadMesh(path, viewer) {
@@ -98,20 +101,25 @@
       loader.load(`${path}.obj`, function (object) {
         object.traverse(child => {
           if (child.isMesh) {
-            child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+            child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, flatShading: true });
           }
         });
 
         const box = new THREE.Box3().setFromObject(object);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3()).length();
-
-        object.position.sub(center); // center the object
         const scale = 1 / size;
-        object.scale.setScalar(scale); // normalize size
 
-        viewer.scene.clear();
-        viewer.scene.add(object);
+        const group = new THREE.Group();
+        group.add(object);
+        object.position.sub(center);
+        group.scale.setScalar(scale);
+
+        if (viewer.objectGroup) {
+          viewer.scene.remove(viewer.objectGroup);
+        }
+        viewer.objectGroup = group;
+        viewer.scene.add(group);
       });
     }
 
