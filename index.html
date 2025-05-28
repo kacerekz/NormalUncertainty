@@ -79,10 +79,8 @@
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(5, 10, 7.5);
-
       scene.add(ambientLight);
       scene.add(directionalLight);
 
@@ -93,7 +91,7 @@
       controls.dampingFactor = 0.05;
       controls.screenSpacePanning = false;
 
-      return { scene, camera, renderer, container, controls, objectGroup: null };
+      return { scene, camera, renderer, container, controls, directionalLight, objectGroup: null };
     }
 
     function loadMesh(path, viewer) {
@@ -131,6 +129,12 @@
       requestAnimationFrame(animate);
       [leftViewer, middleViewer, rightViewer].forEach(viewer => {
         viewer.controls.update();
+
+        // Always point light from camera to origin
+        viewer.directionalLight.position.copy(viewer.camera.position);
+        viewer.directionalLight.target.position.set(0, 0, 0);
+        viewer.scene.add(viewer.directionalLight.target);
+
         viewer.renderer.render(viewer.scene, viewer.camera);
       });
     }
