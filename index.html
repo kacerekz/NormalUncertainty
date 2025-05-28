@@ -48,6 +48,8 @@
       background-color: #357ab8;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/examples/js/loaders/OBJLoader.min.js"></script>
 </head>
 <body>
   <div id="container">
@@ -59,14 +61,11 @@
     <button onclick="submitChoice('left')">Prefer Left</button>
     <button onclick="submitChoice('right')">Prefer Right</button>
   </div>
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.module.js';
-    import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.148.0/examples/jsm/loaders/OBJLoader.js';
-
+  <script>
     const meshSets = [
       'meshes/set1',
       'meshes/set2',
-      'meshes/set3' // Add more sets as needed
+      'meshes/set3'
     ];
 
     let currentSetIndex = 0;
@@ -90,7 +89,7 @@
     }
 
     function loadMesh(path, viewer) {
-      const loader = new OBJLoader();
+      const loader = new THREE.OBJLoader();
       loader.load(`${path}.obj`, function (object) {
         viewer.scene.clear();
         viewer.scene.add(object);
