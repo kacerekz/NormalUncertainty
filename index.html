@@ -48,25 +48,22 @@
       background-color: #357ab8;
     }
   </style>
-</head>
-<body>
-  <div id="container">
-    <div id="left" class="viewer"></div>
-    <div id="middle" class="viewer"></div>
-    <div id="right" class="viewer"></div>
-  </div>
-  <div id="controls">
-    <button onclick="submitChoice('left')">Prefer Left</button>
-    <button onclick="submitChoice('right')">Prefer Right</button>
-  </div>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.148.0/examples/jsm/"
+      }
+    }
+  </script>
   <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.module.js';
-    import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.148.0/examples/jsm/loaders/OBJLoader.js';
+    import * as THREE from 'three';
+    import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
     const meshSets = [
       'meshes/set1',
       'meshes/set2',
-      'meshes/set3' // Add more sets as needed
+      'meshes/set3'
     ];
 
     let currentSetIndex = 0;
@@ -158,5 +155,16 @@
 
     loadCurrentSet();
   </script>
+</head>
+<body>
+  <div id="container">
+    <div id="left" class="viewer"></div>
+    <div id="middle" class="viewer"></div>
+    <div id="right" class="viewer"></div>
+  </div>
+  <div id="controls">
+    <button onclick="submitChoice('left')">Prefer Left</button>
+    <button onclick="submitChoice('right')">Prefer Right</button>
+  </div>
 </body>
 </html>
