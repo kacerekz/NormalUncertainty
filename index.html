@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesh Comparison Experiment</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e2f;
+      color: #e0e0e0;
+    }
+    canvas {
+      display: block;
+    }
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .viewer {
+      width: 30vw;
+      height: 60vh;
+      border: 1px solid #444;
+      background-color: #2c2c3c;
+      box-shadow: 0 0 10px #0008;
+      border-radius: 10px;
+    }
+    #controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #4a90e2;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #357ab8;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="left" class="viewer"></div>
+    <div id="middle" class="viewer"></div>
+    <div id="right" class="viewer"></div>
+  </div>
+  <div id="controls">
+    <button onclick="submitChoice('left')">Prefer Left</button>
+    <button onclick="submitChoice('right')">Prefer Right</button>
+  </div>
+  <script>
+    const meshSets = [
+      'meshes/set1',
+      'meshes/set2',
+      'meshes/set3' // Add more sets as needed
+    ];
+
+    let currentSetIndex = 0;
+    const responses = [];
+
+    function initViewer(containerId) {
+      const container = document.getElementById(containerId);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(0, 1, 1).normalize();
+      scene.add(light);
+
+      camera.position.z = 2;
+
+      return { scene, camera, renderer, container };
+    }
+
+    function loadMesh(path, viewer) {
+      const loader = new THREE.OBJLoader();
+      loader.load(`${path}.obj`, function (object) {
+        viewer.scene.clear();
+        viewer.scene.add(object);
+      });
+    }
+
+    const leftViewer = initViewer('left');
+    const middleViewer = initViewer('middle');
+    const rightViewer = initViewer('right');
+
+    function animate() {
+      requestAnimationFrame(animate);
+      leftViewer.renderer.render(leftViewer.scene, leftViewer.camera);
+      middleViewer.renderer.render(middleViewer.scene, middleViewer.camera);
+      rightViewer.renderer.render(rightViewer.scene, rightViewer.camera);
+    }
+    animate();
+
+    function loadCurrentSet() {
+      const path = meshSets[currentSetIndex];
+      loadMesh(`${path}/left`, leftViewer);
+      loadMesh(`${path}/middle`, middleViewer);
+      loadMesh(`${path}/right`, rightViewer);
+    }
+
+    function submitChoice(choice) {
+      responses.push({
+        set: meshSets[currentSetIndex],
+        choice
+      });
+      currentSetIndex++;
+      if (currentSetIndex < meshSets.length) {
+        loadCurrentSet();
+      } else {
+        sendResults();
+      }
+    }
+
+    function sendResults() {
+      const csv = 'set,choice\n' + responses.map(r => `${r.set},${r.choice}`).join('\n');
+      const form = document.createElement('form');
+      form.action = 'https://formspree.io/f/movdgypd'; // Replace with your Formspree form ID
+      form.method = 'POST';
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'data';
+      input.value = csv;
+      form.appendChild(input);
+
+      const emailInput = document.createElement('input');
+      emailInput.type = 'hidden';
+      emailInput.name = '_replyto';
+      emailInput.value = 'zuzana.kacerekova@gmail.com';
+      form.appendChild(emailInput);
+
+      const submit = document.createElement('input');
+      submit.type = 'submit';
+      form.appendChild(submit);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    loadCurrentSet();
+  </script>
+</body>
+</html>
