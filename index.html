@@ -196,11 +196,16 @@
         currentSetIndex++;
         if (currentSetIndex < meshSets.length) {
           loadCurrentSet();
+        }
+      }, 1000);
+
+      setTimeout(() => {
+        if (currentSetIndex < meshSets.length) {
           viewers.forEach(div => div.style.opacity = '1');
         } else {
           sendResults();
         }
-      }, 1300);
+      }, 1500);
     };
 
     function sendResults() {
