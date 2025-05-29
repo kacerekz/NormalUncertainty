@@ -29,6 +29,7 @@
       box-shadow: 0 0 10px #0008;
       border-radius: 10px;
       position: relative;
+      transition: box-shadow 0.3s ease;
     }
     .label {
       position: absolute;
@@ -107,7 +108,7 @@
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
-      controls.screenSpacePanning = true;
+      controls.screenSpacePanning = false;
       controls.target.set(0, 0, 0);
       controls.enablePan = true;
       controls.minDistance = 0.5;
@@ -141,7 +142,9 @@
         viewer.objectGroup = group;
         viewer.scene.add(group);
 
+        viewer.controls.reset();
         viewer.controls.target.set(0, 0, 0);
+        viewer.camera.position.set(0, 0, 2);
         viewer.controls.update();
       });
     }
@@ -175,11 +178,15 @@
         choice
       });
 
-      document.querySelectorAll('.viewer').forEach(div => {
-        div.style.boxShadow = '0 0 10px #0008';
-      });
+      const viewers = document.querySelectorAll('.viewer');
+      viewers.forEach(div => div.style.boxShadow = '0 0 10px #0008');
       const selectedId = choice === 'left' ? 'left' : 'right';
-      document.getElementById(selectedId).style.boxShadow = '0 0 20px 5px #4a90e2';
+      const selectedDiv = document.getElementById(selectedId);
+
+      selectedDiv.style.boxShadow = '0 0 20px 10px white';
+      setTimeout(() => {
+        viewers.forEach(div => div.style.boxShadow = '0 0 0 transparent');
+      }, 100);
 
       setTimeout(() => {
         currentSetIndex++;
@@ -188,7 +195,7 @@
         } else {
           sendResults();
         }
-      }, 500);
+      }, 600);
     };
 
     function sendResults() {
